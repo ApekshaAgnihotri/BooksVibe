@@ -1,0 +1,20 @@
+<!DOCTYPE validators PUBLIC "-//Apache Struts//XWork Validator 1.0.3//EN"
+        "http://struts.apache.org/dtds/xwork-validator-1.0.3.dtd">
+<validators>
+
+	<field name="from">
+		<field-validator type="required">
+			<message>Date can't be left empty</message>
+		</field-validator>
+	</field>
+
+
+	<field name="to">
+		<field-validator type="required">
+			<message>Date can't be left empty</message>
+		</field-validator>
+	</field>
+
+
+
+</validators>

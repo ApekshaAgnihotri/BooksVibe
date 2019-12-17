@@ -1,0 +1,643 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+   "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+   "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<constant name="struts.devMode" value="false" />
+	<constant name="struts.custom.i18n.resources" value="global" />
+    <constant name="struts.action.excludePattern" value="/rest/.*,/showSubscriptionPlansService" /> 
+    <constant name="struts.convention.result.path" value="/"></constant>
+
+	<package name="BooksVibe.com"  extends="struts-default">
+
+
+		<result-types>
+			<result-type name="tiles"
+				class="org.apache.struts2.views.tiles.TilesResult" />
+		</result-types>
+
+
+         <!--***************************INTERCEPTORS FOR SESSION TRACKING*************************						 -->
+        <interceptors>
+              <interceptor name="MasterAccess" class="com.booksVibe.interceptors.MasterAdminInterceptor"></interceptor>
+        
+                    <interceptor-stack name="MasterStack">
+                        <interceptor-ref name="MasterAccess"></interceptor-ref>
+                        <interceptor-ref name="defaultStack"></interceptor-ref>
+                    </interceptor-stack>
+                
+        
+	           <interceptor name="OperatorAccess" class="com.booksVibe.interceptors.AdminInterceptor"></interceptor>
+		
+		              <interceptor-stack name="OperatorStack">
+		                        <interceptor-ref name="OperatorAccess"></interceptor-ref>
+		                        <interceptor-ref name="defaultStack"></interceptor-ref>
+	                  </interceptor-stack>
+		
+		        <interceptor name="UserAccess" class="com.booksVibe.interceptors.AuthorizedUserInterceptor"></interceptor>
+		 
+		              <interceptor-stack name="UserStack">
+		                        <interceptor-ref name="UserAccess"></interceptor-ref>
+		                      <interceptor-ref name="defaultStack"></interceptor-ref>
+		             </interceptor-stack>
+		             
+		             
+		       <interceptor name="AnnonymousUser" class="com.booksVibe.interceptors.AnnonymousUserInterceptor"></interceptor>
+		 
+		              <interceptor-stack name="AnnonymousUserStack">
+		                        <interceptor-ref name="AnnonymousUser"></interceptor-ref>
+		                      <interceptor-ref name="defaultStack"></interceptor-ref>
+		             </interceptor-stack>
+		             
+		             
+		             <interceptor-stack name="storeStack">
+                           <interceptor-ref name="defaultStack"/>
+                           <interceptor-ref name="store">
+                                   <param name="operationMode">STORE</param>
+                           </interceptor-ref>
+                     </interceptor-stack>
+
+                     <interceptor-stack name="retrieveStack">
+                             <interceptor-ref name="defaultStack"/>
+                             <interceptor-ref name="store">
+                                    <param name="operationMode">RETRIEVE</param>
+                             </interceptor-ref>
+                     </interceptor-stack>
+		
+      </interceptors>
+
+
+       <!--*****************************FOR GLOBAL EXCEPTIONS******************************* -->
+
+            
+            <global-results>
+    					<result name="exception">/views/Exceptions/failure.jsp</result>
+    					<result name="runtime_exception">/views/Exceptions/runtime_exception.jsp</result>
+    					<result name="errorHandler">/views/Exceptions/errorHandler.jsp</result>
+			</global-results>
+ 
+			<global-exception-mappings>
+    					<exception-mapping exception="java.lang.Exception" result="exception"></exception-mapping>
+    					<exception-mapping exception="java.lang.Error" result="errorHandler"></exception-mapping>
+    					<exception-mapping exception="java.lang.RuntimeException" result="runtime_exception"></exception-mapping>
+			</global-exception-mappings>
+
+
+         <!--*******************************USER ACTIONS********************************** -->
+         
+         <action name="index" class="com.booksVibe.actions.login.UserLoginAction" method="getIndexPage">
+			<result name="success" type="tiles">/index.tiles</result>
+		</action>
+         
+         
+         
+         
+         <action name="userHomePage" class="com.booksVibe.actions.login.UserLoginAction" method="userHomePage">
+			<result name="success" type="tiles">/success.tiles</result>
+			<result name="failure" >/views/Exceptions/failure.jsp</result>
+			<result name="master" type="tiles">/adminWelcome.tiles</result>
+			<result name="slaveAdmin" type="tiles">/slaveAdminWelcome.tiles</result>
+		</action>
+
+         
+         
+         
+		<action name="login" class="com.booksVibe.actions.login.UserLoginAction" method="loginVerify">
+			<result name="success" type="redirectAction">userWelcome</result>
+			<result name="error" type="tiles">/loginPage.tiles</result>
+			<result name="input" type="tiles">/loginPage.tiles</result>
+			<result name="failure" >/views/Exceptions/failure.jsp</result>
+			<result name="master" type="tiles">/adminWelcome.tiles</result>
+			<result name="slaveAdmin" type="tiles">/slaveAdminWelcome.tiles</result>
+		</action>
+
+
+       <action name="userWelcome" class="com.booksVibe.actions.books.BookAction" method="fetchNewArrivals">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+			<result name="success" type="tiles">/success.tiles</result>
+			<result name="failure" >/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action> 
+		
+		<action name="logout" class="com.booksVibe.actions.login.UserLoginAction" method="logout">
+			<result name="logout" >/homePage.jsp</result>
+		</action>
+
+
+         <action name="profile" class="com.booksVibe.actions.login.UserLoginAction" method="getUserProfileForm">
+               <interceptor-ref name="UserStack"></interceptor-ref>
+			          <result name="success" type="tiles">/myprofile.tiles</result>
+			          <result name="invalidAccess" type="redirectAction">index</result>
+			          <result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+
+		<action name="editprofile" class="com.booksVibe.actions.login.UserLoginAction" method="editUserDetailsPage">
+		    <interceptor-ref name="UserStack"></interceptor-ref>
+			        <result name="success" type="tiles">/updateuser.tiles</result>
+			        <result name="error" type="tiles">/loginPage.tiles</result>
+			         <result name="invalidAccess" type="redirectAction">index</result>
+			         <result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+
+		<action name="updateprofile" class="com.booksVibe.actions.login.UserLoginAction" method="updateUserDetails">
+		  <interceptor-ref name="UserStack"></interceptor-ref>
+			<result name="success" type="tiles">/success.tiles</result>
+			<result name="input" type="tiles">/updateuser.tiles</result>
+			<result name="error" type="tiles">/loginPage.tiles</result>
+			 <result name="invalidAccess" type="redirectAction">index</result>
+			 <result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+
+
+
+      <!--**************************** USER REGISTRATIONS AND LOGIN ACTIONS***************************** -->
+       
+        
+		<action name="loginPage" class="com.booksVibe.actions.login.UserLoginAction" method="getLoginPage">
+			<result name="success" type="tiles">/loginPage.tiles</result>
+		</action>
+
+		<action name="register" class="com.booksVibe.actions.registration.UserRegistrationAction" method="registerUser">
+			<result name="login" type="tiles">/loginPage.tiles</result>
+			<result name="error" type="tiles">/register.tiles</result>
+			<result name="input" type="tiles">/register.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+		</action>
+
+		<action name="registrationPage" class="com.booksVibe.actions.registration.UserRegistrationAction" method="loadSubscription">
+			<result name="success" type="tiles">/register.tiles</result>
+			<result name="input" type="tiles">/register.tiles</result>
+		</action>
+
+
+
+
+     <!--  *******************OPERATOR ADD UPDATE DELETE BOOKS ACTIONS*****************************-->
+
+		<action name="addBooks" class="com.booksVibe.actions.books.BookAction" method="addBooks"> 
+		
+			<interceptor-ref name="fileUpload">
+			<param name="maximumSize">2097152</param>
+			<param name="allowedTypes">image/png,image/gif,image/jpeg,image/pjpeg,image/jpg</param>
+			</interceptor-ref>
+			 <interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="books" type="tiles">/adminWelcome.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="input" type="tiles">/books.tiles</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+
+		<action name="addBooksPage" class="com.booksVibe.actions.books.BookAction" method="addBooksPage">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="addBooks" type="tiles">/books.tiles</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="updateBook" class="com.booksVibe.actions.books.BookAction" method="updateBook">
+		<interceptor-ref name="fileUpload">
+			<param name="maximumSize">2097152</param>
+			<param name="allowedTypes">image/png,image/gif,image/jpeg,image/pjpeg,image/jpg</param>
+			</interceptor-ref>
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="updateBooks" type="tiles">/adminWelcome.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="updatepage" class="com.booksVibe.actions.books.BookAction" method="booksById">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="updatepage" type="tiles">/updatebooks.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+
+		<action name="deletebook" class="com.booksVibe.actions.books.BookAction" method="deleteBook">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="success" type="tiles">/adminWelcome.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+
+         <!-- *********************SEARCH BOOKS ACTIONS******************************** -->
+         
+         
+		<action name="searchBooks" class="com.booksVibe.actions.books.BookAction" method="searchBooks">
+			<result name="annonymousUserBrowseBooks" type="tiles">/browseResults.tiles</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+		</action>
+
+        <action name="usersearchBooks" class="com.booksVibe.actions.books.BookAction" method="searchBooks">
+        <interceptor-ref name="UserStack"></interceptor-ref>
+         	<result name="userBrowseBooks" type="tiles">/userBrowseResults.tiles</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+	    </action>
+	    	    	
+		<action name="operatorSearchBooks" class="com.booksVibe.actions.books.BookAction" method="searchBooks">
+		  <interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="masterBrowseBooks" type="tiles">/operatorBrowseResults.tiles</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+	    	
+	    	  
+        <!--*****************SUBSCRIPTION PLANS ACTIONS THROUGH XML PARSING*************     -->
+             
+        <action name="uploadPlan" class="com.booksVibe.actions.xmlParsing.XMLParserSax" method="uploadPlanPage" >
+        <interceptor-ref name="MasterStack"></interceptor-ref>
+          <result name="success" type="tiles">/uploadPlans.tiles</result>
+          <result name="invalidAccess" type="redirectAction">index</result>
+          <result name="invalidUserAccess" type="redirect">userHomePage</result>
+        </action>    
+             
+		<action name="subsUpload" class="com.booksVibe.actions.xmlParsing.XMLParserSax"	method="addUpdateRecords">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="success" type="tiles">/adminWelcome.tiles</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+			<result name="input" type="tiles">/uploadPlans.tiles</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="subsDelete" class="com.booksVibe.actions.xmlParsing.XMLParserSax" method="deleteRecords">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="success" type="tiles">/adminWelcome.tiles</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+			<result name="input" type="tiles">/uploadPlans.tiles</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+		
+		<action name="operatorViewSubscriptionPlans" class="com.booksVibe.actions.registration.UserRegistrationAction" method="viewSubscriptionPlans">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="success" type="tiles">/operatorSubscriptionPlans.tiles</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		
+          <!--*******************************USER BOOK SHELF ACTIONS*************** ********************-->
+
+		<action name="addToShelf" class="com.booksVibe.actions.userBookShelf.UserBookShelfAction" method="userBookShelfAction">
+		   <interceptor-ref name="UserStack"></interceptor-ref>
+		   	<result name="success" type="tiles">/userBrowseResults.tiles</result>
+			<result name="error" type="tiles">/userBrowseResults.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="viewMyShelf" class="com.booksVibe.actions.userBookShelf.UserBookShelfAction" method="viewMyShelf">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+		<interceptor-ref name="retrieveStack" />
+			<result name="success" type="tiles">/userShelf.tiles</result>
+			<result name="error" type="tiles">/userShelf.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="deleteFromShelf" class="com.booksVibe.actions.userBookShelf.UserBookShelfAction" method="userBookShelfAction">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+		<interceptor-ref name="storeStack"/>
+			<result name="success" type="redirectAction">viewMyShelf</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+
+
+         <!--***********************USER BOOKS REQUESTS ACTIONS********************* -->
+
+        <action name="confirmAddress" class="com.booksVibe.actions.requestBook.RequestBookAction" method="confirmAddress">
+        <interceptor-ref name="UserStack"></interceptor-ref>
+			<result name="success">/views/Registered-User/confirmAddress.jsp</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+		
+		
+		   <action name="shelfConfirmAddress" class="com.booksVibe.actions.requestBook.RequestBookAction" method="shelfConfirmAddress">
+        <interceptor-ref name="UserStack"></interceptor-ref>
+			<result name="success">/views/Registered-User/confirmAddressShelf.jsp</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+		
+		 <action name="recommendedBooksConfirmAddress" class="com.booksVibe.actions.requestBook.RequestBookAction" method="recommendedBooksConfirmAddress">
+        <interceptor-ref name="UserStack"></interceptor-ref>
+			<result name="success">/views/Registered-User/confirmAddressRecommendation.jsp</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+		
+
+		<action name="requestBook" class="com.booksVibe.actions.requestBook.RequestBookAction" method="requestBook">
+		 <interceptor-ref name="UserStack"></interceptor-ref>
+		 <interceptor-ref name="storeStack"/>
+			<result name="browseBooksPage" type="tiles">/userBrowseResults.tiles</result>
+			<result name="shelfPage" type="redirectAction">viewMyShelf</result>
+			<result name="recommendationsPage" type="redirectAction">getRecommendedBooks</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="viewRequestedBooks" class="com.booksVibe.actions.requestBook.RequestBookAction" method="viewRequestedBooks">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+		<interceptor-ref name="retrieveStack"/>
+			<result name="success" type="tiles">/requestedBooks.tiles</result>
+			<result name="error" type="tiles">/requestedBooks.tiles</result>
+			<result name="failure" >/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="viewIssuedBooks" class="com.booksVibe.actions.requestBook.RequestBookAction" method="viewIssuedBooks">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+		<interceptor-ref name="retrieveStack"/>
+			<result name="success" type="tiles">/issuedBooks.tiles</result>
+			<result name="error" type="tiles">/issuedBooks.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="cancelDeleiveryRequest" class="com.booksVibe.actions.requestBook.RequestBookAction" method="cancelDeleiveryRequest">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+		<interceptor-ref name="storeStack"/>
+			<result name="success" type="redirectAction">viewRequestedBooks</result>
+			<result name="error" type="tiles">/issuedBooks.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="bookReturnRequest" class="com.booksVibe.actions.requestBook.RequestBookAction" method="bookReturnRequest">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+		<interceptor-ref name="storeStack"/>
+			<result name="success" type="redirectAction">viewIssuedBooks</result>
+			<result name="failure" >/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="viewToBeReturnedBooks" class="com.booksVibe.actions.requestBook.RequestBookAction" method="viewToBeReturnedBooks">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+		<interceptor-ref name="retrieveStack"/>
+			<result name="success" type="tiles">/toBeReturnedBooks.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="cancelReturnRequest" class="com.booksVibe.actions.requestBook.RequestBookAction" method="cancelReturnRequest">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+		<interceptor-ref name="storeStack"/>
+			<result name="success" type="redirectAction">viewToBeReturnedBooks</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+
+         <action name="viewMyHistory" class="com.booksVibe.actions.requestBook.RequestBookAction" method="viewMyHistory">
+         <interceptor-ref name="UserStack"></interceptor-ref>
+			<result name="success" type="tiles">/myHistory.tiles</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+
+        <action name="getRecommendedBooks" class="com.booksVibe.actions.recommendation.RecommendBookAction" method="getRecommendedBooks">
+        <interceptor-ref name="UserStack"></interceptor-ref>
+			<result name="success" type="tiles">/recommendedBooks.tiles</result>
+			<result name="error" type="tiles">/success.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+
+		</action>
+		
+
+          <!-- ******************REQUEST HANDLER ACTIONS BY OPERATOR*********************** -->
+          
+		<action name="requestedBooks" class="com.booksVibe.actions.requestHandler.RequestHandler" method="viewRequestedBooks">
+		<interceptor-ref name="OperatorStack"></interceptor-ref>
+			<result name="success" type="tiles">/adminIssueRequest.tiles</result>
+			<result name="slaveAdmin" type="tiles">/deliveryRequests.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="toBeReturnedBooks" class="com.booksVibe.actions.requestHandler.RequestHandler" method="viewBooksToBeReturned">
+		<interceptor-ref name="OperatorStack"></interceptor-ref>
+			<result name="success" type="tiles">/adminReturnRequest.tiles</result>
+			<result name="slaveAdmin" type="tiles">/returnRequests.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="approveDeleiveryRequest" class="com.booksVibe.actions.requestHandler.RequestHandler" method="approveDeleiveryRequest">
+		<interceptor-ref name="OperatorAccess"></interceptor-ref>
+			<result name="success" type="redirectAction">requestedBooks</result>
+			<result name="slaveAdmin" type="redirectAction">requestedBooks</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+        <action name="closeReturnRequest" class="com.booksVibe.actions.requestHandler.RequestHandler" method="closeReturnRequest">
+        <interceptor-ref name="OperatorStack"></interceptor-ref>
+            <result name="success" type="redirectAction">toBeReturnedBooks</result>
+            <result name="slaveAdmin" type="redirectAction">toBeReturnedBooks</result>
+             <result name="error">/views/Exceptions/failure.jsp</result>
+             <result name="invalidAccess" type="redirectAction">index</result>
+             <result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+        </action>
+    
+    <!-- ***********************MASTER REQUEST HANDLING********************* -->
+    <action name="masterRequestedBooks" class="com.booksVibe.actions.requestHandler.RequestHandler" method="viewRequestedBooks">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="success" type="tiles">/adminIssueRequest.tiles</result>
+			<result name="slaveAdmin" type="tiles">/deliveryRequests.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="masterToBeReturnedBooks" class="com.booksVibe.actions.requestHandler.RequestHandler" method="viewBooksToBeReturned">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="success" type="tiles">/adminReturnRequest.tiles</result>
+			<result name="slaveAdmin" type="tiles">/returnRequests.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="masterApproveDeleiveryRequest" class="com.booksVibe.actions.requestHandler.RequestHandler" method="approveDeleiveryRequest">
+		<interceptor-ref name="MasterAccess"></interceptor-ref>
+			<result name="success" type="redirectAction">masterRequestedBooks</result>
+			<result name="slaveAdmin" type="tiles">/slaveAdminWelcome.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+        <action name="masterCloseReturnRequest" class="com.booksVibe.actions.requestHandler.RequestHandler" method="closeReturnRequest">
+        <interceptor-ref name="MasterStack"></interceptor-ref>
+            <result name="success" type="redirectAction">masterToBeReturnedBooks</result>
+            <result name="slaveAdmin" type="tiles">/slaveAdminWelcome.tiles</result>
+             <result name="error">/views/Exceptions/failure.jsp</result>
+             <result name="invalidAccess" type="redirectAction">index</result>
+             <result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+        </action>
+    
+    
+    
+    
+          <!--****************************SLAVE GENERATE PDF ACTIONS********************** -->
+                 
+		<action name="managePDF" class="com.booksVibe.actions.pdf.PdfAction" method="getAuthorsList">
+		<interceptor-ref name="OperatorStack"></interceptor-ref>
+			<result name="success" type="tiles">/managePdf.tiles</result>
+			<result name="slaveAdmin" type="tiles">/slaveManagePdf.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="getParameterMethod" class="com.booksVibe.actions.pdf.PdfAction" method="getFilteredList">
+		<interceptor-ref name="OperatorStack"></interceptor-ref>
+     		<result name="success" type="tiles">/managePdf.tiles</result>
+			<result name="slaveAdmin" type="tiles">/slaveManagePdf.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="input" type="tiles">/managePdf.tiles</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="generatePdf" class="com.booksVibe.actions.pdf.PdfAction" method="generatePdf">
+		<interceptor-ref name="OperatorStack"></interceptor-ref>
+		
+			<result name="success" type="stream">
+               <param name="contentType">application/octet-stream</param>
+               <param name="inputName">pdfInputStream</param>
+               <param name="contentDisposition">attachment;filename="Report.pdf"</param>
+               <param name="bufferSize">1024</param>
+           </result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="error">/adminWelcome.tiles</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+		
+     <!-- ************************MASTER GENERATE PDF***************************** -->
+     <action name="masterManagePDF" class="com.booksVibe.actions.pdf.PdfAction" method="getAuthorsList">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="success" type="tiles">/managePdf.tiles</result>
+			<result name="slaveAdmin" type="tiles">/slaveManagePdf.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="masterGetParameterMethod" class="com.booksVibe.actions.pdf.PdfAction" method="getFilteredList">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+     		<result name="success" type="tiles">/managePdf.tiles</result>
+			<result name="slaveAdmin" type="tiles">/slaveManagePdf.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="input" type="tiles">/managePdf.tiles</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		<action name="masterGeneratePdf" class="com.booksVibe.actions.pdf.PdfAction" method="generatePdf">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+		
+			<result name="success" type="stream">
+               <param name="contentType">application/octet-stream</param>
+               <param name="inputName">pdfInputStream</param>
+               <param name="contentDisposition">attachment;filename="Report.pdf"</param>
+               <param name="bufferSize">1024</param>
+           </result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="error">/adminWelcome.tiles</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+  
+
+
+
+        <!--***************** USERS WITH ACTIVE SUBSCRIPTION PLANS ACTIONS****************** -->
+        
+		<action name="viewUsers" class="com.booksVibe.actions.requestHandler.RequestHandler" method="viewUsers">
+		<interceptor-ref name="MasterStack"></interceptor-ref>
+			<result name="success" type="tiles">/viewUsers.tiles</result>
+			<result name="failure">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+
+
+        <!--*******************************USER SUBSCRIPTION PLAN ACTIONS***************************** -->
+        
+		<action name="upgradePlan" class="com.booksVibe.actions.login.UserLoginAction" method="upgradePlan">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+			<result name="success" type="tiles">/nayaPage.tiles</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+
+		
+		<action name="viewSubscriptionPlans" class="com.booksVibe.actions.registration.UserRegistrationAction" method="viewSubscriptionPlans">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+			<result name="success" type="tiles">/subscriptionPlans.tiles</result>
+			<result name="error">/views/Exceptions/failure.jsp</result>
+			<result name="invalidAccess" type="redirectAction">index</result>
+			<result name="invalidUserAccess" type="redirectAction">userHomePage</result>
+		</action>
+		
+		<action name="viewSubscriptionHistory" class="com.booksVibe.actions.login.UserLoginAction" method="viewSubscriptionHistory">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+		   <result name="success" type="tiles">/subscriptionHistory.tiles</result>
+		   <result name="error">/views/Exceptions/failure.jsp</result>
+		   <result name="invalidAccess" type="redirectAction">index</result>
+		   <result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+		
+		<action name="viewMyPlan" class="com.booksVibe.actions.requestBook.RequestBookAction" method="viewMyPlan">
+		<interceptor-ref name="UserStack"></interceptor-ref>
+		    <result name="success" type="tiles">/myPlan.tiles</result>
+		    <result name="error">/views/Exceptions/failure.jsp</result>
+		    <result name="invalidAccess" type="redirectAction">index</result>
+		    <result name="invalidOperatorAccess" type="redirectAction">userHomePage</result>
+		</action>
+	</package>
+</struts>

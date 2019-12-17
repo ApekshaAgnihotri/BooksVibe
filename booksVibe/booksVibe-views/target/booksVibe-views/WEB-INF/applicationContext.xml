@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:ws="http://jax-ws.dev.java.net/spring/core"
+	xmlns:wss="http://jax-ws.dev.java.net/spring/servlet" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="  
+http://www.springframework.org/schema/beans  
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+http://www.springframework.org/schema/context  
+http://www.springframework.org/schema/context/spring-context-3.0.xsd  
+http://www.springframework.org/schema/tx  
+http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+http://jax-ws.dev.java.net/spring/core
+http://jax-ws.dev.java.net/spring/core.xsd
+http://jax-ws.dev.java.net/spring/servlet
+http://jax-ws.dev.java.net/spring/servlet.xsd">
+
+
+	<context:component-scan base-package="com.booksVibe" />
+
+     <!-- *******************BEAN CONTAINING USER INFORMATION******************** -->
+         
+	<bean id="userBean" class="com.booksVibe.models.UserBean" scope="session"/>
+	<bean id="userValueObject" class="com.booksVibe.service.valueObject.UserValueObject"/>
+	<bean id="userDTO" class="com.booksVibe.dao.DTO.UserDTO"/>
+	
+	    
+	<bean id="loginManagerDaoImpl" class="com.booksVibe.daoImpl.login.LoginManagerDaoImpl"/>
+	<bean id="loginManagerImpl" class="com.booksVibe.serviceImpl.login.LoginManagerImpl"/>
+	
+
+
+     <!--******************BEAN USED WHILE REGISTERING USER******************** -->
+
+	<bean id="regManagerDaoImpl" class="com.booksVibe.daoImpl.registration.RegManagerDaoImpl"/>
+	<bean id="registrationManagerImpl" class="com.booksVibe.serviceImpl.registration.RegistrationManagerImpl"/>
+		
+     <!--*********************BEAN CONTAINING USER SUBSCRIPTION DETAILS**************** -->
+     
+	<bean id="userSubsDTO" class="com.booksVibe.dao.DTO.UserSubsDTO"/>
+    <bean id="userSubsVO" class="com.booksVibe.service.valueObject.UserSubsVO"/>
+    <bean id="userSubsBean" class="com.booksVibe.models.UserSubsBean"/>
+	
+	
+     <!--***********************BEANS CONTAINING SUBSCRIPTION DETAILS*************** -->    
+
+	<bean id="subsDetailsDTO" class="com.booksVibe.dao.DTO.SubsDetailsDTO"/>
+	<bean id="subsDetailsVO" class="com.booksVibe.service.valueObject.SubsDetailsVO"/>
+	<bean id="subsDetailsBean" class="com.booksVibe.models.SubsDetailsBean"/>
+
+
+     <!--*******************BEANS CONTAINING BOOKS DETAILS********************* -->
+    
+	<bean id="booksDTO" class="com.booksVibe.dao.DTO.BooksDTO" />
+	<bean id="booksBean" class="com.booksVibe.models.BooksBean" scope="request"/>
+	<bean id="booksVO" class="com.booksVibe.service.valueObject.BooksVO" />
+	<bean id="booksManagerDao" class="com.booksVibe.daoImpl.books.BooksManagerDaoImpl" />
+	<bean id="booksManagerImpl" class="com.booksVibe.serviceImpl.books.BooksManagerImpl" />
+		
+
+
+    <!--************************BOOKS JOB FOR CSV PROCEDURE************************ -->
+         
+	<bean id="booksTask" class="com.booksVibe.util.schedular.tasks.BooksTask"  />
+	<bean id="schedularTasksManagerImpl" class="com.booksVibe.serviceImpl.schedularTasks.SchedularTasksManagerImpl" scope="singleton"/>
+	<bean id="schedularDaoImpl" class="com.booksVibe.daoImpl.schedularTasks.SchedularTasksDaoImpl" scope="singleton"/>
+	
+	<bean id="recommendBooksTask" class="com.booksVibe.util.schedular.tasks.RecommendBooksTask"  />
+	<bean id="recommendBooksManager" class="com.booksVibe.serviceImpl.recommendation.RecommendBooksManagerImpl" scope="singleton"/>
+	<bean id="recommendBooksDao" class="com.booksVibe.daoImpl.recommendation.RecommendBooksDaoImpl" scope="singleton"/>
+	
+	
+	<bean name="runBooksTaskJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass" value="com.booksVibe.util.schedular.jobs.RunBooksTaskJob" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="booksTask" value-ref="booksTask" />
+				<entry key="recommendBooksTask" value-ref="recommendBooksTask" />
+				
+			</map>
+		</property>
+	</bean>
+	
+	                <!-- Cron Trigger, run every 10 seconds -->
+	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="runBooksTaskJob" />
+		<property name="cronExpression" value="0 0 9 ? * MON *" />
+	</bean>
+
+                           
+          <!-- *******************SUBSCRIPTION PLAN EMAIL ALERTS********************* -->
+
+    <bean id="planReminderTask" class="com.booksVibe.util.schedular.tasks.PlanReminderTask" scope="singleton"/>
+	<bean id="planReminderManagerImpl" class="com.booksVibe.serviceImpl.schedularTasks.PlanReminderManagerImpl" scope="singleton"/>
+	<bean id="planReminderDaoImpl" class="com.booksVibe.daoImpl.schedularTasks.PlanReminderDaoImpl" scope="singleton"/>
+   
+   
+	<bean name="planReminderJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass" value="com.booksVibe.util.schedular.jobs.PlanReminderJob" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="planReminderTask" value-ref="planReminderTask"/>
+			</map>
+		</property>
+	</bean>
+
+      <bean id="cronTriggerDaily" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		   <property name="jobDetail" ref="planReminderJob" />
+		  	<property name="cronExpression" value="0 0 12 1/1 * ? *" />
+	  </bean>
+
+
+       <!-- *****************************ALTER PLAN STATUS****************************** -->
+       
+    <bean id="alterPlanStatusTask" class="com.booksVibe.util.schedular.tasks.AlterPlanStatusTask" />
+    <bean id="alterPlanStatusManager" class="com.booksVibe.serviceImpl.schedularTasks.AlterPlanStatusManagerImpl" scope="singleton"/>
+    <bean id="alterPlanStatusDao" class="com.booksVibe.daoImpl.schedularTasks.AlterPlanStatusDaoImpl" scope="singleton" />
+
+    <bean name="alterPlanStatusJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+		   <property name="jobClass" value="com.booksVibe.util.schedular.jobs.AlterPlanStatusJob" />
+		   <property name="jobDataAsMap">
+			  <map>
+				  <entry key="alterPlanStatusTask" value-ref="alterPlanStatusTask"/>
+			  </map>
+		</property>
+	</bean>
+
+      <bean id="cronTriggerDaily1" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		    <property name="jobDetail" ref="alterPlanStatusJob" />
+	    	<property name="cronExpression" value="0 0 23 1/1 * ? *" />
+	  </bean>
+    
+    <!--********************QUARTZ SCHEDULAR JOBS AND TRIGGERS*********************** -->
+    
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="jobDetails">
+			<list>
+				<ref bean="runBooksTaskJob" />
+				<ref bean="planReminderJob" />
+				<ref bean="alterPlanStatusJob" />
+				
+			</list>
+		</property>
+
+		<property name="triggers">
+			<list>
+				<ref bean="cronTrigger" />
+				<ref bean="cronTriggerDaily" />
+				<ref bean="cronTriggerDaily1" />
+			</list>
+		</property>
+	</bean>
+
+
+     <!--<**********************BEANS WHILE SAX PARSING*********************** -->
+     
+    <bean id="parsingManagerDaoImpl" class="com.booksVibe.daoImpl.xmlParsing.ParsingManagerDaoImpl" />
+    <bean id="parsingManagerImpl" class="com.booksVibe.serviceImpl.xmlParsing.ParsingManagerImpl"  />
+	
+
+
+      <!--*********************BEANS CONTAINING USER'S CART DETAILS***************** -->
+      
+   <bean id="userBookShelfBean" class="com.booksVibe.models.UserBookShelfBean"/>
+   <bean id="userBookShelfVO" class="com.booksVibe.service.valueObject.UserBookShelfVO"/>
+   <bean id="userBookShelfDTO" class="com.booksVibe.dao.DTO.UserBookShelfDTO"/>
+   <bean id="userBookShelfManagerImpl" class="com.booksVibe.serviceImpl.userBookShelf.UserBookShelfManagerImpl"/>
+   <bean id="userBookShelfManagerDaoImpl" class="com.booksVibe.daoImpl.userBookShelf.UserBookShelfManagerDaoImpl"/>
+  
+   
+    <!--***********************BEAN CONTAINING USER'S BOOK REQUEST DETAILS*****************   -->
+    
+   <bean id="requestDTO" class="com.booksVibe.dao.DTO.RequestBookDTO" />
+   <bean id="requestVO" class="com.booksVibe.service.valueObject.RequestBookVO" />
+   <bean id="requestBean" class="com.booksVibe.models.RequestBookBean" scope="request" />
+   <bean id="requestBookManagerImpl" class="com.booksVibe.serviceImpl.requestBook.RequestBookManagerImpl"/>
+   <bean id="requestBookManagerDaoImpl" class="com.booksVibe.daoImpl.requestBook.RequestBookDaoImpl"/>
+
+
+    <!-- *******************BEANS USED FOR REQUEST HANDLING FROM ADMIN SIDE************ -->
+   <bean id="requestHandlerManagerDaoImpl" class="com.booksVibe.daoImpl.requestHandler.RequestHandlerManagerDaoImpl"/>
+   <bean id="requestHandlerManagerImpl" class="com.booksVibe.serviceImpl.requestHandler.RequestHandlerMangerImpl"/>
+
+
+
+      <!--*******************BEAN FOR SENDING EMAILS*********************    -->
+   <bean id="send" class="com.booksVibe.util.mail.SendEmail"/>
+
+
+
+      <!-- ************************BEANS USED WHILE GENERATING PDF******************** -->
+   <bean id="pdfManagerImpl" class="com.booksVibe.serviceImpl.pdf.PdfManagerImpl"/>
+   <bean id="pdfManagerDaoImpl" class="com.booksVibe.daoImpl.pdf.PdfManagerDaoImpl"/>
+   
+   <bean id="authenticateOperatorServiceImpl" class="com.booksVibe.serviceImpl.webService.AuthenticateOperatorServiceImpl"/>
+  
+	<!--***************************SOAP WEB SERVICE ************************* -->
+	
+	<wss:binding url='/showSubscriptionPlansService'>
+		<wss:service>
+			<ws:service bean="#showSubscriptionPlansService" />
+		</wss:service>
+	</wss:binding>
+	<bean id="showSubscriptionPlansService" class="com.booksVibe.serviceImpl.webService.ShowSubscriptionPlansServiceImpl"></bean>
+</beans>
+   
+   

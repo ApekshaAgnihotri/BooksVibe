@@ -1,0 +1,44 @@
+<!DOCTYPE validators PUBLIC "-//Apache Struts//XWork Validator 1.0.3//EN"
+        "http://struts.apache.org/dtds/xwork-validator-1.0.3.dtd">
+<validators>
+	<field name="firstname">
+		<field-validator type="requiredstring">
+			<message key="firstName.required"></message>
+		</field-validator>
+	</field>
+
+
+	<field name="lastname">
+		<field-validator type="requiredstring">
+			<message key="lastName.Required"></message>
+		</field-validator>
+	</field>
+
+
+	<field name="address">
+		<field-validator type="requiredstring">
+			<message key="address.Required"></message>
+		</field-validator>
+	</field>
+
+
+   <field name="contactno">
+		<field-validator type="requiredstring">
+			<message key="contactNo.required"></message>
+		</field-validator>
+		
+		<field-validator type="stringlength">
+             <param name="minLength">10</param>
+             <param name="maxLength">10</param>
+             <param name="trim">true</param>
+             <message key="contactNo.invalid"></message>
+        </field-validator>
+        
+        <field-validator type="regex">
+        	<param name="expression">^[0-9]*$</param>
+        	<message key="contactNo.invalid"></message>
+        </field-validator>
+	</field>
+
+	 
+</validators>

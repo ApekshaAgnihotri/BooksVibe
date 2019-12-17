@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>booksVibe</name>
+	<comment></comment>
+	<projects>
+		<project>booksVibe-businessLogic</project>
+		<project>booksVibe-businessLogic-api</project>
+		<project>booksVibe-businessLogic-impl</project>
+		<project>booksVibe-businessLogic-resource</project>
+		<project>booksVibe-dataAccess</project>
+		<project>booksVibe-dataAccess-api</project>
+		<project>booksVibe-dataAccess-impl</project>
+		<project>booksVibe-dataAccess-resource</project>
+		<project>booksVibe-util</project>
+		<project>booksVibe-views</project>
+		<project>booksVibe-webUi</project>
+		<project>booksVibe-webUi-actions</project>
+		<project>booksVibe-webUi-models</project>
+		<project>RemoteSystemsTempFiles</project>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.m2e.core.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+	</natures>
+</projectDescription>
