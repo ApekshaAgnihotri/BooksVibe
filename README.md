@@ -11,36 +11,36 @@ The user have to select a subscription plan while registering.  He/ She can then
 
 The Master Administrator is a system created Administrator who can create other administrators.
 
-Key Features
+###Key Features
 1. The end user can
-•	Browse online catalogues of books.
-•	Select book and request for books.
-•	Generate return request.
-•	Cancel delivery/return requests.
+-	Browse online catalogues of books.
+-	Select book and request for books.
+-	Generate return request.
+-	Cancel delivery/return requests.
 
 2.The Master Admin of the portal can  add/update/delete 
-•	Books. 
-•	Books via scheduler( CSV file feeding).
-•	Plans (XML file)  and 
-•	Generate PDF report.
+-	Books. 
+-	Books via scheduler( CSV file feeding).
+-	Plans (XML file)  and 
+-	Generate PDF report.
 
 3.The Admin can
-•	View the requested books.
-•	Handles delivery and return requests.
+-	View the requested books.
+-	Handles delivery and return requests.
 
 4.Other Features
-•	BooksVibe is a very user-friendly interface for book renting.
-•	Users get book recommendations and new arrivals that helps them better selection of books.
-•	The administrators can generate PDFs to maintain records of books.
-•	Scheduler takes care of many tasks like adding books in the database, sending mail regarding ending of subscription plan etc. that minimizes administrator’s to do tasks.
+-	BooksVibe is a very user-friendly interface for book renting.
+-	Users get book recommendations and new arrivals that helps them better selection of books.
+-	The administrators can generate PDFs to maintain records of books.
+-	Scheduler takes care of many tasks like adding books in the database, sending mail regarding ending of subscription plan etc. that minimizes administrator’s to do tasks.
 
-BooksVibe Schedular
+###BooksVibe Schedular
 
 The Scheduler performs following tasks:
-•	Add/Update books in the system. It also delete books from the system. This task is done via CSV file. The administrator need to place this csv file in the D:\ drive of the computer system named books.csv. This file should also contains master’s credentials.
+- Add/Update books in the system. It also delete books from the system. This task is done via CSV file. The administrator need to place this csv file in the D:\ drive of the computer system named books.csv. This file should also contains master’s credentials.
 This task runs automatically every Monday at 9.00 am automatically
-•	Builds recommendations for users. This tasks runs automatically every day at 12:00 pm .
-•	Sends mail to the users whose subscription plan is about to end. This tasks runs every day at 11 am.
-•	Change the user subscription plan status if it is expired. This task runs every day at 12:00 am 
+-	Builds recommendations for users. This tasks runs automatically every day at 12:00 pm .
+-	Sends mail to the users whose subscription plan is about to end. This tasks runs every day at 11 am.
+-	Change the user subscription plan status if it is expired. This task runs every day at 12:00 am 
 
 
