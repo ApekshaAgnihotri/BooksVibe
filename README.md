@@ -43,4 +43,16 @@ This task runs automatically every Monday at 9.00 am automatically
 -	Sends mail to the users whose subscription plan is about to end. This tasks runs every day at 11 am.
 -	Change the user subscription plan status if it is expired. This task runs every day at 12:00 am 
 
+## Technology stack
+- MVC Framework : Struts2
+- Object Container : Spring IOC
+- Back-End ORM Technology : Hibernate 4.3.6
+- Database : My SQL 5.5 
+- Build Tool : Apache Maven 3.0.5
+- Scheduler : Quartz 
+- Java Mail API
+- Unit Testing : JUnit 4.7
+- Logging Framework : Log4j 
+- UI Technologies : JSP , Java Script , Bootstrap and jQuery
+
 
