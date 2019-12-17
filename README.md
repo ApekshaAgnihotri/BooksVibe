@@ -11,7 +11,7 @@ The user have to select a subscription plan while registering.  He/ She can then
 
 The Master Administrator is a system created Administrator who can create other administrators.
 
-###### Key Features
+## Key Features
 1.The end user can
 -	Browse online catalogues of books.
 -	Select book and request for books.
