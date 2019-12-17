@@ -11,8 +11,8 @@ The user have to select a subscription plan while registering.  He/ She can then
 
 The Master Administrator is a system created Administrator who can create other administrators.
 
-###Key Features
-1. The end user can
+###### Key Features
+1.The end user can
 -	Browse online catalogues of books.
 -	Select book and request for books.
 -	Generate return request.
@@ -34,7 +34,7 @@ The Master Administrator is a system created Administrator who can create other 
 -	The administrators can generate PDFs to maintain records of books.
 -	Scheduler takes care of many tasks like adding books in the database, sending mail regarding ending of subscription plan etc. that minimizes administrator’s to do tasks.
 
-###BooksVibe Schedular
+###### BooksVibe Schedular
 
 The Scheduler performs following tasks:
 - Add/Update books in the system. It also delete books from the system. This task is done via CSV file. The administrator need to place this csv file in the D:\ drive of the computer system named books.csv. This file should also contains master’s credentials.
